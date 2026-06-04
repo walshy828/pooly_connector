@@ -4,7 +4,6 @@ from __future__ import annotations
 import aiohttp
 
 from .const import (
-    API_COMPLETE_TASK,
     API_DISMISS_TASK,
     API_MAINTENANCE,
     API_MAINTENANCE_TASK,
@@ -56,11 +55,6 @@ class PoolyApiClient:
     async def get_maintenance_task(self, task_type: str) -> dict:
         path = API_MAINTENANCE_TASK.format(task_type=task_type)
         return await self._get(path)
-
-    async def complete_task(self, task_type: str, notes: str | None = None) -> dict:
-        path = API_COMPLETE_TASK.format(task_type=task_type)
-        payload = {"notes": notes} if notes else {}
-        return await self._post(path, payload)
 
     async def dismiss_task(self, task_type: str) -> dict:
         path = API_DISMISS_TASK.format(task_type=task_type)
