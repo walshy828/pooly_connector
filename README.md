@@ -8,6 +8,8 @@ A [HACS](https://hacs.xyz) custom integration that connects your [Pooly](https:/
 
 ## What you get
 
+### Sensors
+
 | Entity | Type | Description |
 |--------|------|-------------|
 | Pool Open | `binary_sensor` | `on` when the pool is open for the season |
@@ -16,10 +18,35 @@ A [HACS](https://hacs.xyz) custom integration that connects your [Pooly](https:/
 | Pool Temperature | `sensor` | Water temperature in °F |
 | Urgent Maintenance Count | `sensor` | Number of urgent/overdue tasks |
 | *Task* (×12) | `sensor` | Per-task state: `urgent` / `overdue` / `due_soon` / `good` |
-| *Task* — Mark Complete (×12) | `button` | Logs the task as done in Pooly |
-| *Task* — Dismiss (×12) | `button` | Snoozes the reminder without logging |
 
-The 12 maintenance task sensors cover: Test Water Chemistry, Add Chlorine, Clean Filter Cartridge, Shock Pool, Clean Skimmer Basket, Run Pool Robot, Vacuum Pool, Empty Pump Basket, Check Water Level, Brush Pool Walls, Check CYA Level, and Backwash Filter.
+### Buttons
+
+Maintenance tasks have **Dismiss** buttons and, where applicable, **Mark Complete** buttons.
+
+| Task | Mark Complete | Dismiss |
+|------|:---:|:---:|
+| 🔬 Test Water Chemistry | — | ✓ |
+| 🧪 Add Chlorine | — | ✓ |
+| ⚡ Shock Pool | — | ✓ |
+| ☀️ Check CYA Level | — | ✓ |
+| 🔧 Clean Filter Cartridge | ✓ | ✓ |
+| ♻️ Backwash / Deep Clean Filter | ✓ | ✓ |
+| 🧹 Clean Skimmer Basket | ✓ | ✓ |
+| 🗑️ Empty Pump Basket | ✓ | ✓ |
+| 🤖 Run Pool Robot | ✓ | ✓ |
+| 🌊 Vacuum Pool | ✓ | ✓ |
+| 💧 Check Water Level | ✓ | ✓ |
+| 🖌️ Brush Pool Walls | ✓ | ✓ |
+
+**Why no "Mark Complete" for water testing and chemical tasks?**
+
+Test Water Chemistry, Add Chlorine, Shock Pool, and Check CYA Level require logging real measurement data (pH, chlorine levels, etc.) to be meaningful. These tasks auto-complete in Pooly when you log the relevant journal entry:
+
+- Log a water test → **Test Water Chemistry** and **Check CYA Level** (if CYA was measured) reset automatically
+- Log a chlorine addition → **Add Chlorine** resets automatically
+- Log a shock treatment → **Shock Pool** resets automatically
+
+You can still **Dismiss** these tasks from HA to snooze the reminder without logging data. To actually complete them, open the Pooly app and log the entry.
 
 ---
 
@@ -58,6 +85,8 @@ The integration will verify connectivity before saving.
 
 To display your pool thermometer or pump state in Pooly's dashboard, add automations that call the `pooly.push_sensor` service when the relevant entity changes.
 
+In your `.env` on the Pooly server, set `HA_PUSH_MODE=true` so Pooly doesn't also try to pull the same data from HA. See the [Pooly README](https://github.com/walshy828/pooly) for details.
+
 ### Example: push pool temperature
 
 ```yaml
@@ -91,15 +120,33 @@ automation:
           entity_id: switch.pool_pump
 ```
 
+### Example: push pump energy
+
+```yaml
+automation:
+  - alias: "Push pump energy to Pooly"
+    trigger:
+      - platform: state
+        entity_id: sensor.pool_pump_energy
+    action:
+      - service: pooly.push_sensor
+        data:
+          sensor_type: pump_energy
+          value: "{{ states('sensor.pool_pump_energy') | float }}"
+          unit: kWh
+          entity_id: sensor.pool_pump_energy
+```
+
 Valid `sensor_type` values: `pool_temp`, `pump_state`, `pump_energy`
 
 ---
 
-## Automations ideas
+## Automation ideas
 
 - Alert when a maintenance task becomes `urgent`
-- Turn on a notification light when `Urgent Maintenance Count` is > 0
-- Dashboard card showing all maintenance sensor states at a glance
+- Turn on a notification light when `Urgent Maintenance Count` > 0
+- Dashboard card showing all 12 task sensor states at a glance
+- Notify household members when the pool health score drops below 6
 - Auto-dismiss tasks when the pool is closed for the season
 
 ---

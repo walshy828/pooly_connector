@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import PoolyApiError
-from .const import DOMAIN
+from .const import DOMAIN, POOLY_APP_ONLY_TASKS
 from .coordinator import PoolyCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,7 +27,10 @@ async def async_setup_entry(
     entities: list[ButtonEntity] = []
     for task_type, task_data in coordinator.data["maintenance"].items():
         display_name = task_data.get("display_name", task_type.replace("_", " ").title())
-        entities.append(PoolyCompleteButton(coordinator, entry, task_type, display_name))
+        # Chemistry/chemical tasks auto-complete when the Pooly app journal entry is saved.
+        # Only a Dismiss button is created for these — no Mark Complete.
+        if task_type not in POOLY_APP_ONLY_TASKS:
+            entities.append(PoolyCompleteButton(coordinator, entry, task_type, display_name))
         entities.append(PoolyDismissButton(coordinator, entry, task_type, display_name))
 
     async_add_entities(entities)

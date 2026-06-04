@@ -27,6 +27,16 @@ TASK_TYPES = [
     "backwash",
 ]
 
+# These tasks require logging a full journal entry in the Pooly app to complete.
+# They auto-complete when the matching entry (measurement / chemical / shock) is saved.
+# HA can only dismiss them — no "Mark Complete" button is created.
+POOLY_APP_ONLY_TASKS = {
+    "test_water",
+    "add_chlorine",
+    "check_cya",
+    "shock_pool",
+}
+
 MAINTENANCE_STATES = ["urgent", "overdue", "due_soon", "good"]
 
 STATE_ICONS = {
