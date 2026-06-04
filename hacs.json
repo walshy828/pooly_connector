@@ -1,0 +1,9 @@
+{
+  "name": "Pooly",
+  "domain": "pooly",
+  "documentation": "https://github.com/walshy828/pooly",
+  "issue_tracker": "https://github.com/walshy828/pooly/issues",
+  "codeowners": ["@walshy828"],
+  "render_readme": true,
+  "homeassistant": "2024.1.0"
+}

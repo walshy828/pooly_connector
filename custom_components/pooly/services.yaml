@@ -1,0 +1,35 @@
+push_sensor:
+  name: Push Sensor Data to Pooly
+  description: >
+    Send a sensor reading (pool temperature, pump state, or energy) from
+    Home Assistant to the Pooly backend so it appears on the Pooly dashboard.
+  fields:
+    sensor_type:
+      name: Sensor Type
+      description: "Type of sensor reading. One of: pool_temp, pump_state, pump_energy"
+      required: true
+      selector:
+        select:
+          options:
+            - pool_temp
+            - pump_state
+            - pump_energy
+    value:
+      name: Value
+      description: "Numeric value. For pump_state use 1 (on) or 0 (off)."
+      required: true
+      selector:
+        number:
+          mode: box
+    unit:
+      name: Unit
+      description: "Unit string, e.g. °F or kWh (optional)."
+      required: false
+      selector:
+        text:
+    entity_id:
+      name: Entity ID
+      description: "Source HA entity ID for traceability in Pooly (optional)."
+      required: false
+      selector:
+        text:

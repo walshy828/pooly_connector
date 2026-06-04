@@ -1,0 +1,20 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Pooly",
+        "description": "Enter the host and port where your Pooly backend is running.",
+        "data": {
+          "host": "Host",
+          "port": "Port"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect. Check that Pooly is running and the host/port are correct."
+    },
+    "abort": {
+      "already_configured": "This Pooly instance is already configured."
+    }
+  }
+}
