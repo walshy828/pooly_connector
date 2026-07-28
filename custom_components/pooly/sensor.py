@@ -2,18 +2,16 @@
 from __future__ import annotations
 
 from homeassistant.components.sensor import (
-    SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, MAINTENANCE_STATES, STATE_ICONS
+from .const import DOMAIN, STATE_ICONS
 from .coordinator import PoolyCoordinator
 
 
@@ -26,7 +24,6 @@ async def async_setup_entry(
 
     entities: list[SensorEntity] = [
         PoolyHealthScoreSensor(coordinator, entry),
-        PoolyTemperatureSensor(coordinator, entry),
         PoolyUrgentCountSensor(coordinator, entry),
     ]
 
@@ -76,21 +73,6 @@ class PoolyHealthScoreSensor(PoolyCoordinatorEntity, SensorEntity):
             "pool_name": status.get("pool_name"),
             "last_updated": status.get("last_updated"),
         }
-
-
-class PoolyTemperatureSensor(PoolyCoordinatorEntity, SensorEntity):
-    _attr_name = "Pool Temperature"
-    _attr_device_class = SensorDeviceClass.TEMPERATURE
-    _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = UnitOfTemperature.FAHRENHEIT
-
-    def __init__(self, coordinator: PoolyCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator, entry)
-        self._attr_unique_id = f"{entry.entry_id}_pool_temp"
-
-    @property
-    def native_value(self) -> float | None:
-        return self.coordinator.data["status"].get("pool_temp_f")
 
 
 class PoolyUrgentCountSensor(PoolyCoordinatorEntity, SensorEntity):
