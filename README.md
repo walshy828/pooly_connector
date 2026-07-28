@@ -13,40 +13,32 @@ A [HACS](https://hacs.xyz) custom integration that connects your [Pooly](https:/
 | Entity | Type | Description |
 |--------|------|-------------|
 | Pool Open | `binary_sensor` | `on` when the pool is open for the season |
-| Pump Running | `binary_sensor` | `on` when the pump is running |
 | Health Score | `sensor` | 1–10 pool health score |
-| Pool Temperature | `sensor` | Water temperature in °F |
 | Urgent Maintenance Count | `sensor` | Number of urgent/overdue tasks |
 | *Task* (×12) | `sensor` | Per-task state: `urgent` / `overdue` / `due_soon` / `good` |
 
+Pool temperature and pump state are deliberately **not** exposed as entities. That data originates
+in Home Assistant and is pushed *up* to Pooly (see below), so mirroring it back would duplicate
+entities you already have.
+
 ### Buttons
 
-Maintenance tasks have **Dismiss** buttons and, where applicable, **Mark Complete** buttons.
+Every maintenance task gets a **Dismiss** button, named `<Task> — Dismiss`, which snoozes the
+reminder in Pooly and refreshes the sensors immediately:
 
-| Task | Mark Complete | Dismiss |
-|------|:---:|:---:|
-| 🔬 Test Water Chemistry | — | ✓ |
-| 🧪 Add Chlorine | — | ✓ |
-| ⚡ Shock Pool | — | ✓ |
-| ☀️ Check CYA Level | — | ✓ |
-| 🔧 Clean Filter Cartridge | ✓ | ✓ |
-| ♻️ Backwash / Deep Clean Filter | ✓ | ✓ |
-| 🧹 Clean Skimmer Basket | ✓ | ✓ |
-| 🗑️ Empty Pump Basket | ✓ | ✓ |
-| 🤖 Run Pool Robot | ✓ | ✓ |
-| 🌊 Vacuum Pool | ✓ | ✓ |
-| 💧 Check Water Level | ✓ | ✓ |
-| 🖌️ Brush Pool Walls | ✓ | ✓ |
+🔬 Test Water Chemistry · 🧪 Add Chlorine · ⚡ Shock Pool · ☀️ Check CYA Level ·
+🔧 Clean Filter Cartridge · ♻️ Backwash / Deep Clean Filter · 🧹 Clean Skimmer Basket ·
+🗑️ Empty Pump Basket · 🤖 Run Pool Robot · 🌊 Vacuum Pool · 💧 Check Water Level ·
+🖌️ Brush Pool Walls
 
-**Why no "Mark Complete" for water testing and chemical tasks?**
+**Why is there no "Mark Complete" button?**
 
-Test Water Chemistry, Add Chlorine, Shock Pool, and Check CYA Level require logging real measurement data (pH, chlorine levels, etc.) to be meaningful. These tasks auto-complete in Pooly when you log the relevant journal entry:
+Completing a task means recording what you actually did, which belongs in the Pooly app rather than
+a stateless button press. Tasks reset automatically when you log the matching journal entry — a
+water test resets **Test Water Chemistry** (and **Check CYA Level**, if CYA was measured), a
+chlorine addition resets **Add Chlorine**, a shock treatment resets **Shock Pool**, and so on.
 
-- Log a water test → **Test Water Chemistry** and **Check CYA Level** (if CYA was measured) reset automatically
-- Log a chlorine addition → **Add Chlorine** resets automatically
-- Log a shock treatment → **Shock Pool** resets automatically
-
-You can still **Dismiss** these tasks from HA to snooze the reminder without logging data. To actually complete them, open the Pooly app and log the entry.
+Dismiss from HA to quiet a reminder; open Pooly to actually complete the task.
 
 ---
 

@@ -23,7 +23,6 @@ async def async_setup_entry(
     coordinator: PoolyCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities([
         PoolyPoolStatusSensor(coordinator, entry),
-        PoolyPumpStateSensor(coordinator, entry),
     ])
 
 
@@ -65,20 +64,3 @@ class PoolyPoolStatusSensor(PoolyCoordinatorEntity, BinarySensorEntity):
             "pool_opened_at": status.get("pool_opened_at"),
             "pool_closed_at": status.get("pool_closed_at"),
         }
-
-
-class PoolyPumpStateSensor(PoolyCoordinatorEntity, BinarySensorEntity):
-    _attr_name = "Pump Running"
-    _attr_device_class = BinarySensorDeviceClass.RUNNING
-    _attr_icon = "mdi:pump"
-
-    def __init__(self, coordinator: PoolyCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator, entry)
-        self._attr_unique_id = f"{entry.entry_id}_pump_state"
-
-    @property
-    def is_on(self) -> bool | None:
-        state = self.coordinator.data["status"].get("pump_state")
-        if state is None:
-            return None
-        return state == "on"
